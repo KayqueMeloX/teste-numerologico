@@ -79,9 +79,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Teste Numerológico" },
-      { name: "description", content: "Em apenas 30 segundos, identifique o número que rege sua vibração e veja como alinhar sua energia com a prosperidade!" },
+      {
+        name: "description",
+        content:
+          "Em apenas 30 segundos, identifique o número que rege sua vibração e veja como alinhar sua energia com a prosperidade!",
+      },
       { property: "og:title", content: "Teste Numerológico" },
-      { property: "og:description", content: "Em apenas 30 segundos, identifique o número que rege sua vibração e veja como alinhar sua energia com a prosperidade!" },
+      {
+        property: "og:description",
+        content:
+          "Em apenas 30 segundos, identifique o número que rege sua vibração e veja como alinhar sua energia com a prosperidade!",
+      },
       { property: "og:type", content: "website" },
     ],
     links: [
@@ -101,18 +109,71 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       {
         rel: "stylesheet",
-        href: "/css/quiz-styles.css",
+        href: appCss,
       },
       {
         rel: "stylesheet",
-        href: appCss,
+        href: "/css/app.664c2c76.css",
+      },
+      {
+        rel: "stylesheet",
+        href: "/css/astrologyStyle.css",
       },
       { rel: "icon", href: "/favicon.png", type: "image/png" },
+      { rel: "dns-prefetch", href: "https://cdn.converteai.net" },
+      { rel: "dns-prefetch", href: "https://scripts.converteai.net" },
+      { rel: "dns-prefetch", href: "https://images.converteai.net" },
+      { rel: "dns-prefetch", href: "https://api.vturb.com.br" },
+      {
+        rel: "preload",
+        href: "https://scripts.converteai.net/0a246cdd-c6bd-48cb-b2bf-d2a8c03c2dd5/players/691b1f1bf65a4dcdb5b35980/v4/player.js",
+        as: "script",
+      },
+      {
+        rel: "preload",
+        href: "https://scripts.converteai.net/lib/js/smartplayer-wc/v4/smartplayer.js",
+        as: "script",
+      },
     ],
     scripts: [
       {
+        src: "https://code.jquery.com/jquery-3.7.0.min.js",
+      },
+      {
+        src: "https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js",
+      },
+      {
+        src: "https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js",
+      },
+      {
+        src: "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js",
+      },
+      {
+        src: "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/CSSRulePlugin.min.js",
+      },
+      {
+        src: "https://kit.fontawesome.com/e4e8e4da22.js",
+        crossOrigin: "anonymous",
+      },
+      {
+        src: "https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js",
+      },
+      {
         src: "https://scripts.converteai.net/lib/js/smartplayer-wc/v4/smartplayer.js",
         async: true,
+      },
+      {
+        src: "https://cdn.utmify.com.br/scripts/utms/latest.js",
+        async: true,
+        defer: true,
+      },
+      {
+        src: "/js/chunk-vendors.99370500.js",
+        defer: true,
+      },
+      {
+        src: "/js/app.3fcf828d.js",
+        defer: true,
       },
     ],
   }),
