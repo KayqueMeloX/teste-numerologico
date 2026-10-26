@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import React, { useState, useEffect, useRef } from "react";
-import { challengeIcons } from "@/data/challenge-icons";
+import { challengeIcons, civilStatusIcons } from "@/data/challenge-icons";
 
 export const Route = createFileRoute("/")({
   component: TesteNumerologico,
@@ -59,12 +59,12 @@ const MONTHS = [
 const DECADES = [1940, 1950, 1960, 1970, 1980, 1990, 2000, 2010];
 
 const CIVIL_STATUSES = [
-  { id: "casado", label: "Casado(a)" },
-  { id: "namorando", label: "Namorando" },
-  { id: "noivo", label: "Noivo(a)" },
-  { id: "solteiro", label: "Solteiro(a)" },
-  { id: "separado", label: "Separado(a)" },
-  { id: "viuvo", label: "Viúvo(a)" },
+  { id: "casado", label: "Casado(a)", icon: civilStatusIcons.casado },
+  { id: "namorando", label: "Namorando", icon: civilStatusIcons.namorando },
+  { id: "noivo", label: "Noivo(a)", icon: civilStatusIcons.noivo },
+  { id: "solteiro", label: "Solteiro(a)", icon: civilStatusIcons.solteiro },
+  { id: "separado", label: "Separado(a)", icon: civilStatusIcons.separado },
+  { id: "viuvo", label: "Viúvo(a)", icon: civilStatusIcons.viuvo },
 ];
 
 const CHALLENGES = [
@@ -599,19 +599,32 @@ export function TesteNumerologico() {
 
             {/* Step 6: Civil Status */}
             {currentStep === 6 && (
-              <div className="text-center max-w-xl mx-auto">
-                <h2 className="main-title text-2xl font-bold mb-6 text-gray-900">
+              <div className="text-center max-w-2xl mx-auto">
+                <h2 className="main-title text-2xl font-bold mb-8 text-gray-900">
                   Qual é o seu Estado Civil?
                 </h2>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8">
                   {CIVIL_STATUSES.map((cs) => (
                     <button
                       key={cs.id}
                       type="button"
                       onClick={() => handleSelectCivilStatus(cs.id)}
-                      className="py-4 px-3 bg-white hover:bg-purple-600 hover:text-white border border-purple-200 rounded-xl font-medium shadow-sm transition-all text-gray-800 text-base"
+                      className="botao-civil flex flex-col items-center justify-center p-5 rounded-2xl shadow-md transition-all transform hover:scale-105 hover:brightness-110 cursor-pointer"
+                      style={{
+                        backgroundColor: "#9d82c6",
+                        border: "2px solid #5b21b6",
+                        minHeight: "135px",
+                        width: "100%",
+                      }}
                     >
-                      {cs.label}
+                      <img
+                        src={cs.icon}
+                        alt={cs.label}
+                        className="w-12 h-12 mb-2 object-contain"
+                      />
+                      <span className="text-white font-bold text-base tracking-wide">
+                        {cs.label}
+                      </span>
                     </button>
                   ))}
                 </div>
@@ -627,20 +640,32 @@ export function TesteNumerologico() {
 
             {/* Step 7: Greatest Challenge */}
             {currentStep === 7 && (
-              <div className="text-center max-w-xl mx-auto">
-                <h2 className="main-title text-2xl font-bold mb-6 text-gray-900">
+              <div className="text-center max-w-2xl mx-auto">
+                <h2 className="main-title text-2xl font-bold mb-8 text-gray-900">
                   Qual o maior desafio da sua vida nesse momento?
                 </h2>
-                <div className="grid grid-cols-2 gap-4 mb-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
                   {CHALLENGES.map((ch) => (
                     <button
                       key={ch.id}
                       type="button"
                       onClick={() => handleSelectDesafio(ch.id)}
-                      className="p-6 bg-white hover:bg-purple-600 hover:text-white border border-purple-200 rounded-2xl font-semibold shadow-md transition-all flex flex-col items-center justify-center gap-3 text-gray-800 group"
+                      className="botao-desafio flex flex-col items-center justify-center p-6 rounded-2xl shadow-md transition-all transform hover:scale-105 hover:brightness-110 cursor-pointer"
+                      style={{
+                        backgroundColor: "#9d82c6",
+                        border: "2px solid #5b21b6",
+                        minHeight: "140px",
+                        width: "100%",
+                      }}
                     >
-                      <img src={ch.icon} alt={ch.label} className="w-12 h-12 object-contain group-hover:brightness-200 transition-all" />
-                      <span className="text-base">{ch.label}</span>
+                      <img
+                        src={ch.icon}
+                        alt={ch.label}
+                        className="w-12 h-12 mb-3 object-contain"
+                      />
+                      <span className="text-white font-bold text-lg tracking-wide">
+                        {ch.label}
+                      </span>
                     </button>
                   ))}
                 </div>
