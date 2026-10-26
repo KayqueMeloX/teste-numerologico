@@ -381,7 +381,7 @@ export function TesteNumerologico() {
       className="page-wrapper min-h-screen text-slate-900"
       id="page-wrapper"
       style={{
-        backgroundColor: backgroundVSL ? "#0b0416" : "#fcfbf8",
+        backgroundColor: backgroundVSL ? "#0b0416" : "#f8fafc",
         backgroundImage: backgroundVSL ? "url('/img/bg.22378cd4.png')" : "none",
         backgroundRepeat: "no-repeat",
         backgroundSize: "cover",
@@ -681,12 +681,15 @@ export function TesteNumerologico() {
 
             {/* Step 8: First Name */}
             {currentStep === 8 && (
-              <div className="text-center max-w-md mx-auto">
-                <h2 className="main-title text-2xl font-bold mb-8 text-[#1a202c]">
+              <div className="text-center max-w-[420px] mx-auto px-2">
+                <h2
+                  className="font-bold text-[#1a202c] mb-8"
+                  style={{ fontSize: "22px", fontFamily: "'Sora', sans-serif" }}
+                >
                   Qual é o seu Primeiro Nome?
                 </h2>
-                <form onSubmit={handleNameSubmit} className="space-y-6 mb-8">
-                  <div className="text-left">
+                <form onSubmit={handleNameSubmit} className="space-y-6">
+                  <div className="text-left w-full">
                     <input
                       type="text"
                       placeholder="Digite seu nome"
@@ -695,32 +698,49 @@ export function TesteNumerologico() {
                         setFirstName(e.target.value);
                         setFirstNameError("");
                       }}
-                      className="w-full px-5 py-4 text-gray-700 text-lg bg-white border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:border-green-500 placeholder-gray-400 font-medium"
+                      style={{
+                        height: "64px",
+                        fontSize: "18px",
+                        borderRadius: "12px",
+                        border: "1.5px solid #d2d6dc",
+                        boxShadow: "0 2px 6px rgba(0, 0, 0, 0.05)",
+                        backgroundColor: "#ffffff",
+                        color: "#2d3748",
+                      }}
+                      className="w-full px-5 outline-none placeholder:text-gray-400 font-medium transition-all focus:border-green-500"
                     />
                     {firstNameError && (
-                      <p className="text-red-500 text-xs mt-2 font-medium">{firstNameError}</p>
+                      <p className="text-red-500 text-xs mt-2 font-medium text-center">{firstNameError}</p>
                     )}
                   </div>
+
                   <button
                     type="submit"
                     style={{
-                      backgroundColor: "#0ea31b",
-                      color: "#ffffff",
+                      height: "62px",
+                      backgroundColor: "#19a10b",
                       borderRadius: "9999px",
-                      boxShadow: "0 8px 22px rgba(14, 163, 27, 0.45)",
+                      boxShadow: "0 6px 18px rgba(25, 161, 11, 0.35)",
+                      color: "#ffffff",
+                      fontSize: "20px",
+                      fontWeight: 800,
+                      fontFamily: "'Sora', sans-serif",
                     }}
-                    className="w-full py-4 px-8 text-white font-extrabold text-xl md:text-2xl tracking-wide cursor-pointer hover:brightness-110 transition-all transform hover:-translate-y-0.5"
+                    className="w-full flex items-center justify-center cursor-pointer hover:brightness-105 transition-all transform hover:-translate-y-0.5 tracking-normal border-none"
                   >
                     Clique Aqui Para Continuar!
                   </button>
                 </form>
-                <button
-                  type="button"
-                  onClick={() => setCurrentStep(7)}
-                  className="btn-voltar text-purple-700 hover:text-purple-900 font-semibold text-sm underline cursor-pointer"
-                >
-                  &lt; Voltar
-                </button>
+
+                <div className="mt-8">
+                  <button
+                    type="button"
+                    onClick={() => setCurrentStep(7)}
+                    className="btn-voltar text-purple-700 hover:text-purple-900 font-semibold text-sm underline cursor-pointer"
+                  >
+                    &lt; Voltar
+                  </button>
+                </div>
               </div>
             )}
           </div>
