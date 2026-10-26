@@ -681,14 +681,14 @@ export function TesteNumerologico() {
 
             {/* Step 8: First Name */}
             {currentStep === 8 && (
-              <div className="text-center max-w-[420px] mx-auto px-2">
+              <div className="min-h-[65vh] flex flex-col justify-center items-center w-full max-w-[420px] mx-auto px-2 text-center">
                 <h2
                   className="font-bold text-[#1a202c] mb-8"
                   style={{ fontSize: "22px", fontFamily: "'Sora', sans-serif" }}
                 >
                   Qual é o seu Primeiro Nome?
                 </h2>
-                <form onSubmit={handleNameSubmit} className="space-y-6">
+                <form onSubmit={handleNameSubmit} className="space-y-6 w-full">
                   <div className="text-left w-full">
                     <input
                       type="text"
@@ -731,16 +731,6 @@ export function TesteNumerologico() {
                     Clique Aqui Para Continuar!
                   </button>
                 </form>
-
-                <div className="mt-8">
-                  <button
-                    type="button"
-                    onClick={() => setCurrentStep(7)}
-                    className="btn-voltar text-purple-700 hover:text-purple-900 font-semibold text-sm underline cursor-pointer"
-                  >
-                    &lt; Voltar
-                  </button>
-                </div>
               </div>
             )}
           </div>
