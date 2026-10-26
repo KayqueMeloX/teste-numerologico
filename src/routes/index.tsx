@@ -682,28 +682,28 @@ export function TesteNumerologico() {
             {/* Step 8: First Name */}
             {currentStep === 8 && (
               <div className="text-center max-w-md mx-auto">
-                <h2 className="main-title text-2xl font-bold mb-6 text-gray-900">
+                <h2 className="main-title text-2xl font-bold mb-8 text-[#1a202c]">
                   Qual é o seu Primeiro Nome?
                 </h2>
-                <form onSubmit={handleNameSubmit} className="space-y-4 mb-8">
+                <form onSubmit={handleNameSubmit} className="space-y-6 mb-8">
                   <div className="text-left">
                     <input
                       type="text"
-                      placeholder="Digite seu Primeiro Nome"
+                      placeholder="Digite seu nome"
                       value={firstName}
                       onChange={(e) => {
                         setFirstName(e.target.value);
                         setFirstNameError("");
                       }}
-                      className="w-full px-4 py-3 border border-purple-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white text-gray-800 text-lg shadow-sm"
+                      className="w-full px-5 py-4 text-gray-700 text-lg bg-white border-2 border-gray-200 rounded-xl shadow-sm focus:outline-none focus:border-green-500 placeholder-gray-400 font-medium"
                     />
                     {firstNameError && (
-                      <p className="text-red-500 text-xs mt-1 font-medium">{firstNameError}</p>
+                      <p className="text-red-500 text-xs mt-2 font-medium">{firstNameError}</p>
                     )}
                   </div>
                   <button
                     type="submit"
-                    className="w-full py-4 px-6 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all text-lg cursor-pointer transform hover:-translate-y-0.5"
+                    className="w-full py-4 px-8 bg-[#0ea31b] hover:bg-[#0c8f18] text-white font-extrabold rounded-full shadow-[0_8px_20px_rgba(14,163,27,0.35)] hover:shadow-[0_10px_24px_rgba(14,163,27,0.45)] transition-all transform hover:-translate-y-0.5 text-xl tracking-wide cursor-pointer"
                   >
                     Clique Aqui Para Continuar!
                   </button>
