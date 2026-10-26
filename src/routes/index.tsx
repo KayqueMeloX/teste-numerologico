@@ -417,7 +417,7 @@ export function TesteNumerologico() {
 
                 <div className="alert-box bg-amber-50 border border-amber-200 rounded-lg p-4 mb-8 flex items-center justify-center gap-3 text-amber-800 text-sm max-w-xl mx-auto shadow-sm">
                   <span className="text-xl">⚠️</span>
-                  <p className="m-0 font-medium">Atenção: Se tudo começar a fluir depois do teste, você me deve um PIX de R$ 5,00!</p>
+                  <p className="m-0 font-medium">Atenção: Se tudo começar a fluir depois do teste, você me deve um MBWAY de 5,00€!</p>
                 </div>
 
                 <p className="selection-prompt text-lg font-medium text-gray-700 mb-6">
