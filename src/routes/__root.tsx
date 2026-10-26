@@ -101,6 +101,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       {
         rel: "stylesheet",
+        href: "/css/quiz-styles.css",
+      },
+      {
+        rel: "stylesheet",
         href: appCss,
       },
       { rel: "icon", href: "/favicon.png", type: "image/png" },
