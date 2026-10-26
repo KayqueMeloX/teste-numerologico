@@ -108,6 +108,7 @@ export function TesteNumerologico() {
   // Flow & VSL states
   const [isCalculating, setIsCalculating] = useState<boolean>(false);
   const [backgroundVSL, setBackgroundVSL] = useState<boolean>(false);
+  const [isLoadingVSL, setIsLoadingVSL] = useState<boolean>(false);
   const [showP1Video, setShowP1Video] = useState<boolean>(false);
   const [currentVideoIdP1, setCurrentVideoIdP1] = useState<string>("");
   const [showEmailModal, setShowEmailModal] = useState<boolean>(false);
@@ -171,7 +172,6 @@ export function TesteNumerologico() {
     const officialDestiny = calculateNumerologyNumber(totalBefore);
     setDestinyNumber(officialDestiny);
 
-    // Show step 5.5 (calculating screen)
     setIsCalculating(true);
     setTimeout(() => {
       setIsCalculating(false);
@@ -195,7 +195,7 @@ export function TesteNumerologico() {
     }, 250);
   };
 
-  // Step 8: Name submission -> Transition to Personalized Video P1
+  // Step 8: Name submission -> Transition to VSL
   const handleNameSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     const trimmed = firstName.trim();
@@ -214,6 +214,7 @@ export function TesteNumerologico() {
 
     setFirstNameError("");
     setBackgroundVSL(true);
+    setIsLoadingVSL(true);
 
     // Calculate user age & video key
     const currentYear = new Date().getFullYear();
@@ -237,8 +238,12 @@ export function TesteNumerologico() {
     const videoIdP1 = VIDEO_MAP_P1[keyP1] || VIDEO_MAP_P1["H_20_S"];
     setCurrentVideoIdP1(videoIdP1);
 
-    setCurrentStep(9); // Quiz completed
-    setShowP1Video(true);
+    // After 2s of loading animation, show Video P1
+    setTimeout(() => {
+      setIsLoadingVSL(false);
+      setCurrentStep(9);
+      setShowP1Video(true);
+    }, 2000);
   };
 
   // Mount VTurb P1 script & player
@@ -251,6 +256,7 @@ export function TesteNumerologico() {
     playerEl.style.cssText = "display: block; margin: 0 auto; width: 100%; max-width: 400px;";
 
     const placeholder = document.createElement("div");
+    placeholder.className = "vturb-player-placeholder";
     placeholder.style.cssText =
       "position: relative; width: 100%; padding: 177.77777777777777% 0 0; z-index: 0; background-color: black;";
     playerEl.appendChild(placeholder);
@@ -263,25 +269,30 @@ export function TesteNumerologico() {
     script.setAttribute("data-vturb-p1", "true");
     document.head.appendChild(script);
 
-    // Listen for video end
     const handleEnd = () => {
       setShowEmailModal(true);
     };
 
-    window.addEventListener("message", (evt) => {
+    const handleMsg = (evt: MessageEvent) => {
       try {
         const data = typeof evt.data === "string" ? JSON.parse(evt.data) : evt.data;
         if (
           data?.type === "vturb:video-ended" ||
           data?.type === "video-ended" ||
-          data?.event === "ended"
+          data?.event === "ended" ||
+          data?.smartplayer?.event === "ended"
         ) {
           handleEnd();
         }
       } catch {}
-    });
+    };
+
+    window.addEventListener("message", handleMsg);
+    document.addEventListener("smartplayer:ended", handleEnd, { once: true });
 
     return () => {
+      window.removeEventListener("message", handleMsg);
+      document.removeEventListener("smartplayer:ended", handleEnd);
       script.remove();
     };
   }, [showP1Video, currentVideoIdP1]);
@@ -320,7 +331,6 @@ export function TesteNumerologico() {
     setCurrentVideoIdP2(videoIdP2);
     setShowP2Video(true);
 
-    // Track lead
     try {
       fetch(
         `https://add-lead-getresponse-br.mahilaluz.workers.dev?email=${encodeURIComponent(
@@ -340,21 +350,22 @@ export function TesteNumerologico() {
     const playerEl = document.createElement("vturb-smartplayer");
     if (isAb) {
       playerEl.id = currentVideoIdP2;
+      playerEl.style.cssText = "display: block; margin: 0 auto; width: 100%; max-width: 400px;";
     } else {
       playerEl.id = `vid-${currentVideoIdP2}`;
+      playerEl.style.cssText = "display: block; margin: 0 auto; width: 100%; max-width: 400px;";
+      const placeholder = document.createElement("div");
+      placeholder.className = "vturb-player-placeholder";
+      placeholder.style.cssText =
+        "position: relative; width: 100%; padding: 177.77777777777777% 0 0; z-index: 0; background-color: black;";
+      playerEl.appendChild(placeholder);
     }
-    playerEl.style.cssText = "display: block; margin: 0 auto; width: 100%; max-width: 400px;";
-
-    const placeholder = document.createElement("div");
-    placeholder.style.cssText =
-      "position: relative; width: 100%; padding: 177.77777777777777% 0 0; z-index: 0; background-color: black;";
-    playerEl.appendChild(placeholder);
     videoP2ContainerRef.current.appendChild(playerEl);
 
     const script = document.createElement("script");
     script.type = "text/javascript";
     script.src = isAb
-      ? `https://scripts.converteai.net/${VTURB_ACCOUNT_ID}/players/${currentVideoIdP2}/player.js`
+      ? `https://scripts.converteai.net/${VTURB_ACCOUNT_ID}/ab-test/${currentVideoIdP2.slice(3)}/player.js`
       : `https://scripts.converteai.net/${VTURB_ACCOUNT_ID}/players/${currentVideoIdP2}/v4/player.js`;
     script.async = true;
     script.setAttribute("data-vturb-p2", "true");
@@ -370,6 +381,14 @@ export function TesteNumerologico() {
     setPartePitch(true);
     setShowP2Video(false);
 
+    if (pitchContainerRef.current) {
+      pitchContainerRef.current.innerHTML = "";
+      const playerEl = document.createElement("vturb-smartplayer");
+      playerEl.setAttribute("id", "vid-691b1f1bf65a4dcdb5b35980");
+      playerEl.style.cssText = "display: block; margin: 0 auto; width: 100%; max-width: 400px;";
+      pitchContainerRef.current.appendChild(playerEl);
+    }
+
     const script = document.createElement("script");
     script.src = `https://scripts.converteai.net/${VTURB_ACCOUNT_ID}/players/691b1f1bf65a4dcdb5b35980/v4/player.js`;
     script.async = true;
@@ -378,19 +397,48 @@ export function TesteNumerologico() {
 
   return (
     <div
-      className="page-wrapper min-h-screen text-slate-900"
+      className="page-wrapper min-h-screen text-slate-900 relative"
       id="page-wrapper"
       style={{
         backgroundColor: backgroundVSL ? "#0b0416" : "#f8fafc",
-        backgroundImage: backgroundVSL ? "url('/img/bg.22378cd4.png')" : "none",
-        backgroundRepeat: "no-repeat",
-        backgroundSize: "cover",
-        backgroundPosition: "center top",
       }}
     >
-      {/* Top Progress Bar */}
+      {/* Background for VSL */}
+      {backgroundVSL && (
+        <div
+          className="background-image-sign"
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "purple",
+            zIndex: 0,
+          }}
+        >
+          <img
+            src="/img/bg.22378cd4.png"
+            style={{ width: "100%", height: "100%", objectFit: "cover", filter: "brightness(0.6)" }}
+            alt=""
+          />
+        </div>
+      )}
+
+      {/* Top Progress Bar for Quiz */}
       {currentStep <= 8 && (
-        <div className="progress-bar-top" style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "8px", zIndex: 1000, backgroundColor: "#e2e8f0" }}>
+        <div
+          className="progress-bar-top"
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "8px",
+            zIndex: 1000,
+            backgroundColor: "#e2e8f0",
+          }}
+        >
           <div
             className="progress-bar-fill"
             style={{
@@ -403,9 +451,9 @@ export function TesteNumerologico() {
         </div>
       )}
 
-      <div className="container mx-auto px-4 py-8 max-w-3xl">
-        {/* Section 1: Quiz steps */}
-        {currentStep <= 8 && (
+      {/* Section 1: Quiz steps */}
+      {currentStep <= 8 && (
+        <div className="container mx-auto px-4 py-8 max-w-3xl relative z-10">
           <div className="ga4983248 eh90427">
             {/* Step 1: Gender */}
             {currentStep === 1 && (
@@ -734,44 +782,58 @@ export function TesteNumerologico() {
               </div>
             )}
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Section 2: Video P1 */}
-        {showP1Video && (
-          <div className="video-p1-section text-center text-white space-y-6">
-            <h3 className="text-xl md:text-2xl font-bold text-amber-300">
-              {firstName ? `${firstName}, sua` : "Sua"} Leitura Numerológica Personalizada
-            </h3>
-            {destinyNumber > 0 && (
-              <p className="text-purple-200 text-sm">
-                Seu Número de Destino oficial é <span className="text-amber-400 font-bold text-lg">{destinyNumber}</span>
-              </p>
-            )}
-
-            <div ref={videoP1ContainerRef} className="personalized-video-container mx-auto" />
-
-            <div className="mt-4">
-              <button
-                type="button"
-                onClick={() => setShowEmailModal(true)}
-                className="py-3 px-8 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl shadow-lg transition-all text-base animate-pulse cursor-pointer"
-              >
-                Continuar Leitura &gt;
-              </button>
-            </div>
+      {/* Loading Block after step 8 */}
+      {isLoadingVSL && (
+        <div className="fixed inset-0 z-50 flex flex-col justify-center items-center bg-purple-950/90 text-white">
+          <h3 className="text-xl md:text-2xl font-bold mb-6 text-center px-4" style={{ fontFamily: "'Sora', sans-serif" }}>
+            Carregando a sua leitura numerológica...
+          </h3>
+          <div className="progress-bar w-72 h-6 bg-white/20 rounded-full overflow-hidden p-0.5 shadow-inner">
+            <div
+              className="progress-fill h-full rounded-full"
+              style={{
+                width: "100%",
+                background: "linear-gradient(270deg, #9333ea 0%, #ec4899 100%)",
+                animation: "progress-forward 2s ease-in-out forwards",
+              }}
+            />
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Section 3: Email Opt-in Modal */}
-        {showEmailModal && (
-          <div className="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
-            <div className="bg-[#4682B4] rounded-2xl p-6 sm:p-8 max-w-lg w-full text-white text-center shadow-2xl border border-sky-300/30">
-              <p className="text-lg md:text-xl font-medium mb-6">
+      {/* Section 2: Video P1 */}
+      {showP1Video && !isLoadingVSL && (
+        <section className="video-p1-section relative z-10 w-full min-h-screen flex flex-col items-center justify-center py-6 px-4">
+          <div
+            id="personalized-video-p1"
+            ref={videoP1ContainerRef}
+            className="personalized-video-container w-full max-w-[400px] mx-auto shadow-2xl rounded-2xl overflow-hidden"
+          />
+        </section>
+      )}
+
+      {/* Section 3: Email Opt-in Modal */}
+      {showEmailModal && (
+        <section className="parte2-fullscreen fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm" id="email-optin-modal">
+          <div
+            className="form-modal w-full max-w-lg rounded-2xl p-6 md:p-8 text-white text-center shadow-2xl"
+            style={{ backgroundColor: "#4682B4" }}
+          >
+            <div className="hf-4920">
+              <p className="section-p text-lg md:text-xl font-medium mb-6 leading-relaxed" style={{ fontFamily: "'Sora', serif" }}>
                 Digite o seu <b>e-mail</b> para receber o restante da sua <b>leitura personalizada...</b>
               </p>
+            </div>
 
-              <form onSubmit={handleValidateEmail} className="space-y-4">
-                <div className="text-left">
+            <form onSubmit={handleValidateEmail} className="space-y-4">
+              <div className="form-content text-left">
+                <h4 className="text-center font-bold text-lg mb-3" style={{ fontFamily: "'Sora', serif", color: "white" }}>
+                  Qual é o seu Email?
+                </h4>
+                <div className="input-control">
                   <input
                     type="email"
                     placeholder="Digite seu Email"
@@ -780,60 +842,74 @@ export function TesteNumerologico() {
                       setEmailValue(e.target.value);
                       setEmailError("");
                     }}
-                    className="w-full px-4 py-3 rounded-xl text-gray-900 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400 text-base"
+                    style={{ height: "56px", fontSize: "16px" }}
+                    className="field-input w-full px-4 rounded-xl text-gray-900 bg-white placeholder-gray-400 outline-none shadow-sm focus:ring-2 focus:ring-green-400 font-medium"
                   />
-                  {emailError && (
-                    <p className="text-amber-200 text-xs mt-1 font-medium">{emailError}</p>
-                  )}
                 </div>
+                {emailError && (
+                  <p className="text-amber-200 text-xs mt-2 text-center font-medium">{emailError}</p>
+                )}
+              </div>
 
+              <div className="form-button">
                 <button
                   type="submit"
-                  className="w-full py-4 px-6 bg-[#19a10b] hover:bg-green-600 text-white font-bold text-xl rounded-xl shadow-lg transition-all animate-pulse cursor-pointer"
+                  style={{
+                    height: "56px",
+                    backgroundColor: "#19a10b",
+                    borderRadius: "12px",
+                    fontSize: "18px",
+                    fontFamily: "'Sora', serif",
+                  }}
+                  className="button-form pulsating-button w-full text-white font-bold cursor-pointer hover:brightness-105 transition-all shadow-lg animate-pulse border-none"
                 >
                   Clique para continuar
                 </button>
-              </form>
-            </div>
+              </div>
+            </form>
           </div>
-        )}
+        </section>
+      )}
 
-        {/* Section 4: Video P2 */}
-        {showP2Video && (
-          <div className="video-p2-section text-center text-white space-y-6">
-            <h3 className="text-xl md:text-2xl font-bold text-amber-300">
-              Segunda Parte: A Revelação Sobre Seu Desafio
-            </h3>
+      {/* Section 4: Video P2 */}
+      {showP2Video && (
+        <section className="video-p2-section relative z-10 w-full min-h-screen flex flex-col items-center justify-center py-6 px-4">
+          <div
+            id="personalized-video-p2"
+            ref={videoP2ContainerRef}
+            className="personalized-video-container-p2 w-full max-w-[400px] mx-auto shadow-2xl rounded-2xl overflow-hidden"
+          />
 
-            <div ref={videoP2ContainerRef} className="personalized-video-container-p2 mx-auto" />
-
-            <div className="mt-6">
-              <button
-                type="button"
-                onClick={handleShowPitch}
-                className="py-4 px-8 bg-[#19a10b] hover:bg-green-600 text-white font-extrabold text-xl rounded-2xl shadow-2xl transition-all animate-bounce cursor-pointer"
-              >
-                Quero fazer o Ritual Numerológico
-              </button>
-            </div>
+          <div className="mt-8 text-center w-full max-w-[420px]">
+            <button
+              type="button"
+              onClick={handleShowPitch}
+              style={{
+                backgroundColor: "#19a10b",
+                borderRadius: "16px",
+                fontSize: "20px",
+                fontWeight: 800,
+                fontFamily: "'Sora', sans-serif",
+                boxShadow: "0 8px 24px rgba(25, 161, 11, 0.45)",
+              }}
+              className="button-form pulsating-button w-full py-4 px-6 text-white cursor-pointer hover:brightness-110 transition-all transform hover:-translate-y-0.5 animate-pulse border-none"
+            >
+              Quero fazer o Ritual Numerológico
+            </button>
           </div>
-        )}
+        </section>
+      )}
 
-        {/* Section 5: Pitch Offer */}
-        {partePitch && (
-          <div className="pitch-section text-center text-white space-y-6">
-            <div ref={pitchContainerRef} className="w-full flex justify-center">
-              <div
-                dangerouslySetInnerHTML={{
-                  __html: `<vturb-smartplayer id="vid-691b1f1bf65a4dcdb5b35980" style="display: block; margin: 0 auto; width: 100%; max-width: 400px;"></vturb-smartplayer>`,
-                }}
-              />
-            </div>
-          </div>
-        )}
+      {/* Section 5: Pitch Offer */}
+      {partePitch && (
+        <section className="ps03120003100000 relative z-10 w-full min-h-screen flex items-center justify-center py-6 px-4">
+          <div ref={pitchContainerRef} className="w-full flex justify-center" />
+        </section>
+      )}
 
-        {/* Footer */}
-        <footer className="footer-disclaimer mt-16 pt-8 border-t border-gray-200/40 text-center text-xs text-gray-500 space-y-4">
+      {/* Footer - Only visible during quiz (section1) */}
+      {currentStep <= 8 && (
+        <footer className="footer-disclaimer mt-16 pt-8 border-t border-gray-200/40 text-center text-xs text-gray-500 space-y-4 relative z-10">
           <p className="disclaimer-text max-w-xl mx-auto leading-relaxed">
             <strong className="text-gray-700">Aviso Legal:</strong> Este site não faz parte do Facebook ou do Meta.
             Além disso, NÃO somos endossados pelo Facebook de nenhuma maneira. FACEBOOK é uma marca registrada da Meta Platforms, Inc.
@@ -867,7 +943,7 @@ export function TesteNumerologico() {
             </button>
           </div>
         </footer>
-      </div>
+      )}
 
       {/* Legal Modals */}
       {activeLegalModal && (
