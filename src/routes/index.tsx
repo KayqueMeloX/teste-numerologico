@@ -703,7 +703,13 @@ export function TesteNumerologico() {
                   </div>
                   <button
                     type="submit"
-                    className="w-full py-4 px-8 bg-[#0ea31b] hover:bg-[#0c8f18] text-white font-extrabold rounded-full shadow-[0_8px_20px_rgba(14,163,27,0.35)] hover:shadow-[0_10px_24px_rgba(14,163,27,0.45)] transition-all transform hover:-translate-y-0.5 text-xl tracking-wide cursor-pointer"
+                    style={{
+                      backgroundColor: "#0ea31b",
+                      color: "#ffffff",
+                      borderRadius: "9999px",
+                      boxShadow: "0 8px 22px rgba(14, 163, 27, 0.45)",
+                    }}
+                    className="w-full py-4 px-8 text-white font-extrabold text-xl md:text-2xl tracking-wide cursor-pointer hover:brightness-110 transition-all transform hover:-translate-y-0.5"
                   >
                     Clique Aqui Para Continuar!
                   </button>
