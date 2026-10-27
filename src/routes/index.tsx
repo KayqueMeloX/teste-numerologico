@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import React, { useEffect, useRef } from "react";
+import { CHECKOUT_CONFIG } from "@/config/checkout";
 
 export const Route = createFileRoute("/")({
   component: TesteNumerologicoApp,
@@ -11,7 +12,38 @@ export function TesteNumerologicoApp() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    // Ensure fallback execution in case deferred scripts took longer or navigated client-side
+    // Set global Stripe checkout link for access across scripts
+    (window as any).STRIPE_CHECKOUT_URL = CHECKOUT_CONFIG.stripeCheckoutUrl;
+
+    // Global Stripe Checkout Redirection Interceptor
+    const handleGlobalClick = (e: MouseEvent) => {
+      const target = (e.target as HTMLElement)?.closest("a, button");
+      if (!target) return;
+
+      const href = (target as HTMLAnchorElement).href || "";
+
+      // Intercept any clicks on legacy payment links and redirect directly to Stripe
+      const isLegacyCheckout =
+        href.includes("pay.assiny.com.br") ||
+        href.includes("kirvano.com") ||
+        href.includes("hotmart.com") ||
+        href.includes("kiwify.com");
+
+      if (isLegacyCheckout) {
+        e.preventDefault();
+        e.stopPropagation();
+        const url = (window as any).STRIPE_CHECKOUT_URL || CHECKOUT_CONFIG.stripeCheckoutUrl;
+        if (CHECKOUT_CONFIG.openInNewTab) {
+          window.open(url, "_blank");
+        } else {
+          window.location.href = url;
+        }
+      }
+    };
+
+    document.addEventListener("click", handleGlobalClick, true);
+
+    // Fallback execution in case deferred scripts took longer or navigated client-side
     const timer = setTimeout(() => {
       const isMounted =
         document.querySelector(".quiz-container") || document.querySelector(".eh90427");
@@ -30,14 +62,19 @@ export function TesteNumerologicoApp() {
       }
     }, 300);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener("click", handleGlobalClick, true);
+    };
   }, []);
 
   return (
-    <div
-      id="app-root-wrapper"
-      dangerouslySetInnerHTML={{ __html: '<div id="app"></div>' }}
-      suppressHydrationWarning
-    />
+    <div className="relative min-h-screen">
+      <div
+        id="app-root-wrapper"
+        dangerouslySetInnerHTML={{ __html: '<div id="app"></div>' }}
+        suppressHydrationWarning
+      />
+    </div>
   );
 }
